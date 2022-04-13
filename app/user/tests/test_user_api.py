@@ -6,6 +6,7 @@ from rest_framework import status
 
 CREATE_USER_URL = reverse('user:create')
 TOKEN_URL = reverse('user:token')
+USER_URL = reverse('user:me')
 
 
 def create_user(**kwargs):
@@ -78,3 +79,45 @@ class PublicUserAPITest(TestCase):
         response = self.client.post(TOKEN_URL, self.payload)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertNotIn('token', response.data)
+
+    def test_retrieve_unauthorized_user(self):
+        """ Test authentication is required for user """
+        response = self.client.get(USER_URL)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
+class PrivateUserAPITest(TestCase):
+    """ Test APIs that require authentication """
+
+    def setUp(self) -> None:
+        self.user = create_user(
+            email='test@gmail.com',
+            password='test_password',
+            name='test'
+        )
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
+        print(self.user.is_authenticated)
+
+    def test_retrieve_profile(self):
+        """ Test retrieving profile for authenticated user """
+        response = self.client.get(USER_URL)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, {
+            'email': self.user.email,
+            'name': self.user.name,
+        })
+
+    def test_post_to_user_not_allowed(self):
+        """ Test post method isn't allowed on profile url """
+        response = self.client.post(USER_URL, {})
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_update_user_profile(self):
+        """ Test updating profile for authenticated users """
+        payload = {'name': 'update', 'password': 'update'}
+        response = self.client.patch(USER_URL, payload)
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.name, payload.get('name'))
+        self.assertTrue(self.user.check_password(payload.get('password')))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
