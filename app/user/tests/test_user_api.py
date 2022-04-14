@@ -97,7 +97,6 @@ class PrivateUserAPITest(TestCase):
         )
         self.client = APIClient()
         self.client.force_authenticate(user=self.user)
-        print(self.user.is_authenticated)
 
     def test_retrieve_profile(self):
         """ Test retrieving profile for authenticated user """
