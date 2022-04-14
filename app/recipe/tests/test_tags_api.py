@@ -20,6 +20,7 @@ class PublicTagsAPITest(TestCase):
         response = self.client.get(TAGS_URL)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
+
 class PrivateTagsAPITest(TestCase):
     """ Test authorized user tags API """
     def setUp(self) -> None:
@@ -71,5 +72,3 @@ class PrivateTagsAPITest(TestCase):
         payload = {'name': ''}
         response = self.client.post(TAGS_URL, payload)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
-

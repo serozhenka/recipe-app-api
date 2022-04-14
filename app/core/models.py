@@ -52,3 +52,12 @@ class Tag(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Ingredient(models.Model):
+    """ Ingredient to be used in recipe """
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    name = models.CharField(max_length=256)
+
+    def __str__(self):
+        return self.name
