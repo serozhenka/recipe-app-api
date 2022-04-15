@@ -5,6 +5,7 @@ from . import views
 router = DefaultRouter()
 router.register('tags', views.TagAPIViewSet, basename='tags')
 router.register('ingredients', views.IngredientAPIViewSet, basename='ingredients')
+router.register('recipes', views.RecipeAPIViewSet, basename='recipes')
 
 app_name = 'recipe'
 
